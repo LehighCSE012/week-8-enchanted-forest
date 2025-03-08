@@ -1,41 +1,15 @@
-# test_display_inventory.py
 import pytest
-import adventure
-import io
-import sys
+from adventure import Adventurer, Goblin, TreasureChest  # Assuming student's code is in adventure.py
 
-def capture_stdout(func, *args, **kwargs):
-    capturedOutput = io.StringIO()
-    sys.stdout = capturedOutput
-    func(*args, **kwargs)
-    sys.stdout = sys.__stdout__
-    return capturedOutput.getvalue()
 
-def test_display_inventory_empty():
-    inventory = {}
-    output = capture_stdout(adventure.display_inventory, inventory)
-    assert output == "Inventory is empty.\n"
+def test_treasure_chest_open_empty_chest(capsys): #9
+    """Test TreasureChest open_chest method with empty chest."""
+    hero = Adventurer(name="EmptyChestHero", initial_health=100)
+    chest = TreasureChest(items=[]) # Empty chest
+    open_result = chest.open_chest(hero)
+    captured = capsys.readouterr()
 
-def test_display_inventory_non_empty():
-    inventory = {"Potion": 2, "Torch": 1, "Gold Coins": 50}
-    output = capture_stdout(adventure.display_inventory, inventory)
-    expected_output_lines = [
-        "Current Inventory:",
-        " - Potion: 2",
-        " - Torch: 1",
-        " - Gold Coins: 50",
-        "" # newline at the end
-    ]
-    expected_output = "\n".join(expected_output_lines)
-    assert output == expected_output
-
-def test_display_inventory_single_item():
-    inventory = {"Sword": 1}
-    output = capture_stdout(adventure.display_inventory, inventory)
-    expected_output_lines = [
-        "Current Inventory:",
-        " - Sword: 1",
-        ""
-    ]
-    expected_output = "\n".join(expected_output_lines)
-    assert output == expected_output
+    assert chest.is_open == True, "Empty TreasureChest is_open not set to True after opening"
+    assert hero.inventory == {}, "Empty TreasureChest added items to adventurer's inventory (should be empty)"
+    expected_empty_chest_output = "You open the chest, but it is empty."
+    assert open_result == expected_empty_chest_output, f"open_chest return message for empty chest incorrect, got: '{open_result}', expected: '{expected_empty_chest_output}'"
